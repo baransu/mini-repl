@@ -42,6 +42,14 @@ double power(double x, double n) {
   }
 }
 
+double factorial(double x) {
+  double result = 1;
+  for(int i = 1; i <= x; i++) {
+    result *= i;
+  }
+  return result;
+}
+
 double root(double a, double n) {
   double result = a;
   double tmp = power(result,(n-1));
@@ -64,7 +72,7 @@ void onp() {
       int len = sizeof(rownanie);
       for(unsigned int i = 0; i < len; i++) {
         char c = rownanie[i];
-        if((c == '+' || c == '/' || c == '-' || c == '*' || c == '^') && size(&stos) > 1) {
+        if(c == '+' || c == '/' || c == '-' || c == '*' || c == '^') && size(&stos) > 1) {
           double wynik;
           double snd = pop(&stos);
           double fst = pop(&stos);
@@ -140,6 +148,8 @@ void onp() {
             push(&stos, wynik);
           } else if(strstr(function, "sqrt") != 0){
             push(&stos, root(pop(&stos), 2));
+          } else if(strstr(function, "factorial") != 0){
+            push(&stos, factorial(pop(&stos)));
           }
 
         } else if ((c >= '0' && c <= '9') || c == '.') { // TODO add float support
