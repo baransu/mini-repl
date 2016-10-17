@@ -50,6 +50,38 @@ double factorial(double x) {
   return result;
 }
 
+double sine(double x) {
+  double sin = x;
+  const double n = 9;
+  unsigned short isNeg = 1;
+  for(int i = 3; i <= n; i += 2) {
+    if(isNeg) {
+      sin -= power(x,i)/factorial(i);
+      isNeg = 0;
+    } else {
+      sin += power(x,i)/factorial(i);
+      isNeg = 1;
+    }
+  }
+  return sin;
+}
+
+double cosine(double x) {
+  double cos = 1;
+  const double n = 10;
+  unsigned short isNeg = 1;
+  for(int i = 2; i <= n; i += 2) {
+    if(isNeg) {
+      cos -= power(x,i)/factorial(i);
+      isNeg = 0;
+    } else {
+      cos += power(x,i)/factorial(i);
+      isNeg = 1;
+    }
+  }
+  return cos;
+}
+
 double root(double a, double n) {
   double result = a;
   double tmp = power(result,(n-1));
@@ -72,7 +104,7 @@ void onp() {
       int len = sizeof(rownanie);
       for(unsigned int i = 0; i < len; i++) {
         char c = rownanie[i];
-        if(c == '+' || c == '/' || c == '-' || c == '*' || c == '^') && size(&stos) > 1) {
+        if((c == '+' || c == '/' || c == '-' || c == '*' || c == '^') && size(&stos) > 1) {
           double wynik;
           double snd = pop(&stos);
           double fst = pop(&stos);
@@ -137,19 +169,23 @@ void onp() {
             double fst = pop(&stos);
             wynik = power(fst, snd);
             push(&stos, wynik);
-          } else if(strstr(function, "neg") != 0){
+          } else if(strstr(function, "neg") != 0) {
             double fst = pop(&stos);
             wynik = -fst;
             push(&stos, wynik);
-          } else if(strstr(function, "root") != 0){
+          } else if(strstr(function, "root") != 0) {
             double fst = pop(&stos);
             double snd = pop(&stos);
             wynik = root(fst, snd);
             push(&stos, wynik);
-          } else if(strstr(function, "sqrt") != 0){
+          } else if(strstr(function, "sqrt") != 0) {
             push(&stos, root(pop(&stos), 2));
-          } else if(strstr(function, "factorial") != 0){
+          } else if(strstr(function, "factorial") != 0) {
             push(&stos, factorial(pop(&stos)));
+          } else if(strstr(function, "sin") != 0) {
+            push(&stos, sine(pop(&stos)));
+          } else if(strstr(function, "cos") != 0) {
+            push(&stos, cosine(pop(&stos)));
           }
 
         } else if ((c >= '0' && c <= '9') || c == '.') { // TODO add float support
