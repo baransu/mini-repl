@@ -1,1 +1,1 @@
-# C lang boilerplate
+# kalkulator-naukowy
