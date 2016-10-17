@@ -68,7 +68,7 @@ double sine(double x) {
 
 double cosine(double x) {
   double cos = 1;
-  const double n = 10;
+  const double n = 8;
   unsigned short isNeg = 1;
   for(int i = 2; i <= n; i += 2) {
     if(isNeg) {
@@ -188,7 +188,7 @@ void onp() {
             push(&stos, cosine(pop(&stos)));
           }
 
-        } else if ((c >= '0' && c <= '9') || c == '.') { // TODO add float support
+        } else if ((c >= '0' && c <= '9') || c == '.') {
           char number[256] = {' '};
           int iterator = 0;
           while((i < len && c >= '0' && c <= '9') || c == '.') {
