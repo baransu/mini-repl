@@ -5,71 +5,12 @@
 
 #include "stack.h"
 #include "hash-map.h"
-
-double power(double x, double n) {
-  if(n == 0.0) {
-    return 1.0;
-  } else if((int)n % 2 == 1) {
-    return x * power(x, n - 1);
-  } else {
-    double a = power(x, n/2.0);
-    return a * a;
-  }
-}
-
-double factorial(double x) {
-  double result = 1;
-  for(int i = 1; i <= x; i++) {
-    result *= i;
-  }
-  return result;
-}
-
-double sine(double x) {
-  x = fmod(x, 2 * 3.14);
-  double sin = x;
-  const short n = 7;
-
-  for(int i = 3; i <= n; i += 4)
-    sin -= power(x, i) / factorial(i);
-
-  for(int i = 3; i <= n; i += 4)
-    sin += power(x, i) / factorial(i);
-
-  return sin;
-}
-
-double cosine(double x) {
-  x = fmod(x, 2 * 3.14);
-  double cos = 1;
-  const short n = 8;
-
-  for(int i = 2; i <= n; i += 4)
-    cos -= power(x, i) / factorial(i);
-
-  for(int i = 4; i <= n; i += 4)
-    cos += power(x, i) / factorial(i);
-
-  return cos;
-}
-
-double root(double a, double n) {
-  double result = a;
-  double tmp = power(result,(n-1));
-  double precision = 0.00000001;
-
-  while (fabs(a - tmp * result) >= precision) {
-    result = 1/n*((n-1)*result + (a/tmp));
-    tmp = power(result, n-1);
-  }
-
-  return result;
-}
+#include "math.h"
 
 void onp(char* rownanie) {
   Stack stos;
   init(&stos);
-  int len = sizeof(rownanie);
+  const int len = strlen(rownanie);
   for(unsigned int i = 0; i < len; i++) {
     char c = rownanie[i];
     if((c == '+' || c == '/' || c == '-' || c == '*' || c == '^') && size(&stos) > 1) {
@@ -102,6 +43,7 @@ void onp(char* rownanie) {
     } else if (c >= 'a' && c <= 'z') {
       char function[64] = {' '};
       int iterator = 0;
+      
       while(i < len && c >= 'a' && c <= 'z') {
         function[iterator++] = rownanie[i++];
         c = rownanie[i];
@@ -127,7 +69,7 @@ void onp(char* rownanie) {
         double snd = pop(&stos);
         double fst = pop(&stos);
         if(snd == 0) {
-          printf("Cannot divide by 0!!!");
+          printf("Cannot divide by 0!!!\n");
           return;
         }
         wynik = fst / snd;
@@ -148,12 +90,16 @@ void onp(char* rownanie) {
         push(&stos, wynik);
       } else if(strstr(function, "sqrt") != 0) {
         push(&stos, root(pop(&stos), 2));
-      } else if(strstr(function, "factorial") != 0) {
+      } else if(strstr(function, "factorial") != 0) { // factorial
         push(&stos, factorial(pop(&stos)));
-      } else if(strstr(function, "sin") != 0) {
+      } else if(strstr(function, "sin") != 0) { // sine
         push(&stos, sine(pop(&stos)));
-      } else if(strstr(function, "cos") != 0) {
+      } else if(strstr(function, "cos") != 0) { // cosine
         push(&stos, cosine(pop(&stos)));
+      } else if(strstr(function, "rad") != 0) { // convert to radians
+        push(&stos, to_radians(pop(&stos)));
+      } else if(strstr(function, "deg") != 0) { // convert to degrees
+        push(&stos, to_degrees(pop(&stos)));
       }
 
     } else if ((c >= '0' && c <= '9') || c == '.') {
@@ -173,6 +119,7 @@ void onp(char* rownanie) {
 
 int main () {
   char rownanie[256] = {' '};
+  // TODO some command about entering REPL mode or something
   printf("> ");
 
   while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) {
