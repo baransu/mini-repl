@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -51,8 +52,9 @@ double factorial(double x) {
 }
 
 double sine(double x) {
+  x = fmod(x, 3.14);
   double sin = x;
-  const double n = 9;
+  const double n = 7;
   unsigned short isNeg = 1;
   for(int i = 3; i <= n; i += 2) {
     if(isNeg) {
@@ -67,6 +69,7 @@ double sine(double x) {
 }
 
 double cosine(double x) {
+  x = fmod(x, 3.14);
   double cos = 1;
   const double n = 8;
   unsigned short isNeg = 1;
