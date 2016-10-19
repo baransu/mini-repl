@@ -151,6 +151,8 @@ void onp(char* rownanie) {
 
 void infix(char* wejscie) {
   CharStack stos;
+  StringStack function_stack;
+  s_init(&function_stack);
   c_init(&stos);
   const unsigned int len = strlen(wejscie);
   char wyjscie[1024] = {' '};
@@ -159,14 +161,22 @@ void infix(char* wejscie) {
     char c = wejscie[i];
 
     if(c == '(') {
-        c_push(&stos, c);
+      c_push(&stos, c);
     }
 
     else if (c == ')') {
       while(c_size(&stos) > 0) {
         char top = c_pop(&stos);
         if(top != '(') {
-          wyjscie[iterator++] = top;
+          if(top == '#') {
+            char* function = s_pop(&function_stack);
+            unsigned int len = strlen(function);
+            for(unsigned int i = 0; i < len; i++) {
+              wyjscie[iterator++] = function[i];
+            }
+          } else {
+            wyjscie[iterator++] = top;
+          }
           wyjscie[iterator++] = ' ';
         } else break;
       }
@@ -179,7 +189,18 @@ void infix(char* wejscie) {
           wyjscie[iterator++] = o2;
           wyjscie[iterator++] = ' ';
           c_pop(&stos);
+        }
+
+        else if(o2 == '#') {
+          c_pop(&stos);
+          char* function = s_pop(&function_stack);
+          unsigned int len = strlen(function);
+          for(unsigned int i = 0; i < len; i++) {
+            wyjscie[iterator++] = function[i];
+          }
+
         } else break;
+
       }
       c_push(&stos, c);
     }
@@ -187,10 +208,21 @@ void infix(char* wejscie) {
     else if (c == '*' || c == '/') {
       while(c_size(&stos) > 0) {
         char o2 = c_back(&stos);
+
         if(o2 == '*' || o2 == '/') {
           wyjscie[iterator++] = o2;
           wyjscie[iterator++] = ' ';
           c_pop(&stos);
+        }
+
+        else if(o2 == '#') {
+          c_pop(&stos);
+          char* function = s_pop(&function_stack);
+          unsigned int len = strlen(function);
+          for(unsigned int i = 0; i < len; i++) {
+            wyjscie[iterator++] = function[i];
+          }
+
         } else break;
       }
       c_push(&stos, c);
@@ -213,16 +245,53 @@ void infix(char* wejscie) {
     }
 
     else if (c >= 'a' && c <= 'z') { // funkcje
-      // TODO zczytaj string
-      // TODO stworz stos funckji
-      // TODO wsadz string na stos
+      char function[64] = {' '};
+      int iterator = 0;
+
+      while(i < len && c >= 'a' && c <= 'z') {
+        function[iterator++] = wejscie[i++];
+        c = wejscie[i];
+      }
+      --i;
+
+      c_push(&stos, '#');
+      s_push(&function_stack, function);
     }
+
+    else if (c == ',') {
+      while(c_size(&stos) > 0) {
+        char top = c_pop(&stos);
+        if(top != '(') {
+          if(top == '#') {
+            char* function = s_pop(&function_stack);
+            unsigned int len = strlen(function);
+            for(unsigned int i = 0; i < len; i++) {
+              wyjscie[iterator++] = function[i];
+            }
+          } else {
+            wyjscie[iterator++] = top;
+          }
+          wyjscie[iterator++] = ' ';
+        } else break;
+      }
+    }
+
   }
 
   while(c_size(&stos) > 0) {
-    wyjscie[iterator++] = c_pop(&stos);
+    char last = c_pop(&stos);
+    if(last == '#') {
+      char* function = s_pop(&function_stack);
+      unsigned int len = strlen(function);
+      for(unsigned int i = 0; i < len; i++) {
+        wyjscie[iterator++] = function[i];
+      }
+    } else {
+      wyjscie[iterator++] = last;
+    }
   }
 
+  printf("wyjscie: %s\n", wyjscie);
   onp(wyjscie);
 }
 
@@ -259,5 +328,3 @@ int main (int argc, char** argv) {
 
   return 0;
 }
-
-

@@ -30,7 +30,7 @@ int d_size(DoubleStack* stos) {
 }
 
 
-// CHAR* STACK
+// CHAR STACK
 
 struct CharStack {
   int top;
@@ -66,5 +66,44 @@ void c_push(CharStack* stos, char wartosc) {
 }
 
 int c_size(CharStack* stos) {
+  return stos->top;
+}
+
+
+// STRING STACK
+
+struct StringStack {
+  int top;
+  char* stack[1024];
+};
+typedef struct StringStack StringStack;
+
+void s_init(StringStack *stos) {
+  stos->top = 0;
+  for(unsigned short i = 0; i < 1024; i++) {
+    stos->stack[i] = "";
+  }
+}
+
+int s_isEmpty(StringStack* stos) {
+  return stos->top;
+}
+
+char* s_pop(StringStack* stos) {
+  char* last = stos->stack[stos->top];
+  stos->top -= 1;
+  return last;
+}
+
+char* s_back(StringStack* stos) {
+  return stos->stack[stos->top];
+}
+
+void s_push(StringStack* stos, char* wartosc) {
+  stos->top += 1;
+  stos->stack[stos->top] = wartosc;
+}
+
+int s_size(StringStack* stos) {
   return stos->top;
 }
