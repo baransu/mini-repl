@@ -13,10 +13,12 @@ void onp(char* rownanie) {
   const int len = strlen(rownanie);
   for(unsigned int i = 0; i < len; i++) {
     char c = rownanie[i];
+
     if((c == '+' || c == '/' || c == '-' || c == '*' || c == '^') && d_size(&stos) > 1) {
       double wynik;
       double snd = d_pop(&stos);
       double fst = d_pop(&stos);
+
       switch(c) {
       case '+':
         wynik = fst + snd;
@@ -40,7 +42,9 @@ void onp(char* rownanie) {
       }
 
       d_push(&stos, wynik);
-    } else if (c >= 'a' && c <= 'z') {
+    }
+
+    else if (c >= 'a' && c <= 'z') {
       char function[64] = {' '};
       int iterator = 0;
 
@@ -55,17 +59,23 @@ void onp(char* rownanie) {
         double fst = d_pop(&stos);
         wynik = fst + snd;
         d_push(&stos, wynik);
-      } else if(strstr(function, "subtract") != 0) {
+      }
+
+      else if(strstr(function, "subtract") != 0) {
         double snd = d_pop(&stos);
         double fst = d_pop(&stos);
         wynik = fst - snd;
         d_push(&stos, wynik);
-      } else if(strstr(function, "multiply") != 0) {
+      }
+
+      else if(strstr(function, "multiply") != 0) {
         double snd = d_pop(&stos);
         double fst = d_pop(&stos);
         wynik = fst * snd;
         d_push(&stos, wynik);
-      } else if(strstr(function, "divide") != 0) {
+      }
+
+      else if(strstr(function, "divide") != 0) {
         double snd = d_pop(&stos);
         double fst = d_pop(&stos);
         if(snd == 0) {
@@ -74,35 +84,55 @@ void onp(char* rownanie) {
         }
         wynik = fst / snd;
         d_push(&stos, wynik);
-      } else if(strstr(function, "pow") != 0) {
+      }
+
+      else if(strstr(function, "pow") != 0) {
         double snd = d_pop(&stos);
         double fst = d_pop(&stos);
         wynik = power(fst, snd);
         d_push(&stos, wynik);
-      } else if(strstr(function, "neg") != 0) {
+      }
+
+      else if(strstr(function, "neg") != 0) {
         double fst = d_pop(&stos);
         wynik = -fst;
         d_push(&stos, wynik);
-      } else if(strstr(function, "root") != 0) {
+      }
+
+      else if(strstr(function, "root") != 0) {
         double fst = d_pop(&stos);
         double snd = d_pop(&stos);
         wynik = root(fst, snd);
         d_push(&stos, wynik);
-      } else if(strstr(function, "sqrt") != 0) {
+      }
+
+      else if(strstr(function, "sqrt") != 0) {
         d_push(&stos, root(d_pop(&stos), 2));
-      } else if(strstr(function, "factorial") != 0) { // factorial
+      }
+
+      else if(strstr(function, "factorial") != 0) { // factorial
         d_push(&stos, factorial(d_pop(&stos)));
-      } else if(strstr(function, "sin") != 0) { // sine
+      }
+
+      else if(strstr(function, "sin") != 0) { // sine
         d_push(&stos, sine(d_pop(&stos)));
-      } else if(strstr(function, "cos") != 0) { // cosine
+      }
+
+      else if(strstr(function, "cos") != 0) { // cosine
         d_push(&stos, cosine(d_pop(&stos)));
-      } else if(strstr(function, "rad") != 0) { // convert to radians
+      }
+
+      else if(strstr(function, "rad") != 0) { // convert to radians
         d_push(&stos, to_radians(d_pop(&stos)));
-      } else if(strstr(function, "deg") != 0) { // convert to degrees
+      }
+
+      else if(strstr(function, "deg") != 0) { // convert to degrees
         d_push(&stos, to_degrees(d_pop(&stos)));
       }
 
-    } else if ((c >= '0' && c <= '9') || c == '.') {
+    }
+
+    else if ((c >= '0' && c <= '9') || c == '.') {
       char number[256] = {' '};
       int iterator = 0;
       while((i < len && c >= '0' && c <= '9') || c == '.') {
@@ -113,6 +143,7 @@ void onp(char* rownanie) {
       sscanf(number, "%lf", &val);
       d_push(&stos, val);
     }
+
   }
 
   printf("%f\n", d_pop(&stos));
@@ -126,6 +157,7 @@ void infix(char* wejscie) {
   unsigned int iterator = 0;
   for(int i = 0; i < len; i++) {
     char c = wejscie[i];
+
     if(c == '(') {
         c_push(&stos, c);
     }
@@ -191,20 +223,37 @@ void infix(char* wejscie) {
     wyjscie[iterator++] = c_pop(&stos);
   }
 
-  printf("ONP: %s\n", wyjscie);
   onp(wyjscie);
 }
 
-int main (int argc, char* argv) {
-  printf("args: %s\n", argv);
+int main (int argc, char** argv) {
+  int mode = 0; // set infix to default
+  for(unsigned int i = 0; i < argc; i++) {
+    char* arg = argv[i];
+    if(strstr(arg, "--infix") != 0) {
+      mode = 0;
+      printf("Running in INFIX mode\n");
+      break;
+    }
+    else if(strstr(arg, "--onp") != 0) {
+      mode = 1;
+      printf("Running in ONP mode\n");
+      break;
+    }
+  }
+
   char rownanie[256] = {' '};
-  // TODO some command about entering REPL mode or something
-  // TODO infix notation
   printf("> ");
 
   while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) {
-    infix(rownanie);
-    //onp(rownanie);
+    switch(mode) {
+    case 0: //infix
+      infix(rownanie);
+      break;
+    case 1: // onp
+      onp(rownanie);
+      break;
+    }
     printf("> ");
   }
 
