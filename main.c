@@ -6,6 +6,7 @@
 #include "stack.h"
 #include "hash-map.h"
 #include "math.h"
+#include "tree.h"
 
 void onp(char* rownanie) {
   DoubleStack stos;
@@ -296,35 +297,48 @@ void infix(char* wejscie) {
 }
 
 int main (int argc, char** argv) {
-  int mode = 0; // set infix to default
-  for(unsigned int i = 0; i < argc; i++) {
-    char* arg = argv[i];
-    if(strstr(arg, "--infix") != 0) {
-      mode = 0;
-      printf("Running in INFIX mode\n");
-      break;
-    }
-    else if(strstr(arg, "--onp") != 0) {
-      mode = 1;
-      printf("Running in ONP mode\n");
-      break;
-    }
-  }
 
-  char rownanie[256] = {' '};
-  printf("> ");
+  Tree tree;
+  init_tree(&tree);
 
-  while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) {
-    switch(mode) {
-    case 0: //infix
-      infix(rownanie);
-      break;
-    case 1: // onp
-      onp(rownanie);
-      break;
-    }
-    printf("> ");
-  }
+  set(&tree, "a", "zmienna a");
+  set(&tree, "b", "zmienna b");
+  set(&tree, "c", "zmienna c");
 
+  char* data = get(&tree, "a");
+  printf("data: %s\n", data);
+
+  /* int mode = 0; // set infix to default */
+  /* for(unsigned int i = 0; i < argc; i++) { */
+  /*   char* arg = argv[i]; */
+  /*   if(strstr(arg, "--infix") != 0) { */
+  /*     mode = 0; */
+  /*     printf("Running in INFIX mode\n"); */
+  /*     break; */
+  /*   } */
+  /*   else if(strstr(arg, "--onp") != 0) { */
+  /*     mode = 1; */
+  /*     printf("Running in ONP mode\n"); */
+  /*     break; */
+  /*   } */
+  /* } */
+
+  /* char rownanie[256] = {' '}; */
+  /* printf("> "); */
+
+  /* while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) { */
+  /*   switch(mode) { */
+  /*   case 0: //infix */
+  /*     infix(rownanie); */
+  /*     break; */
+  /*   case 1: // onp */
+  /*     onp(rownanie); */
+  /*     break; */
+  /*   } */
+  /*   printf("> "); */
+  /* } */
+
+  // dealocate tree
+  clear_tree(&tree);
   return 0;
 }
