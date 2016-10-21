@@ -298,7 +298,6 @@ void infix(char* wejscie, Tree* tree) {
       char variable[64] = {' '};
       int iter = 0;
       // eat @
-      int c_remove_start = i;
       variable[iter++] = '@';
       c = wejscie[++i];
       while(i < len && c >= 'a' && c <= 'z') {
@@ -308,6 +307,10 @@ void infix(char* wejscie, Tree* tree) {
       --i;
 
       char* var_text = get(tree, variable);
+      if(var_text == 0) {
+        printf("I could not find variable: %s\n", variable);
+        return;
+      }
       unsigned int len = strlen(var_text);
       int ii = 0;
       while(ii < len) {
@@ -392,6 +395,7 @@ int main (int argc, char** argv) {
   printf("> ");
 
   while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) {
+    if(strstr(rownanie, "print") != 0) print_tree(&tree);
     switch(mode) {
     case 0: //infix
       infix(rownanie, &tree);

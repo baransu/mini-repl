@@ -49,7 +49,7 @@ void set(Tree* tree, char* name, char* data) {
 
 char* get_leaf(Leaf* leaf, char* name) {
   if(leaf != 0) {
-    int names_equality = strcmp(leaf->name, name);
+    int names_equality = strcmp(name, leaf->name);
     if(names_equality == 0) {
       return leaf->data;
     }
@@ -61,6 +61,7 @@ char* get_leaf(Leaf* leaf, char* name) {
     else if (leaf->left != 0) {
       return get_leaf(leaf->left, name);
     }
+
   }
 
   return 0;
