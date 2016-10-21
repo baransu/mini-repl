@@ -8,10 +8,55 @@
 #include "math.h"
 #include "tree.h"
 
-void onp(char* rownanie) {
+int handle_variables(char* wejscie, Tree* tree) {
+  const int len = strlen(wejscie);
+  if(len > 4 && strstr(wejscie, "let") != 0) {
+    char var_text[256] = {' '};
+    int iter = 0;
+    char variable[64] = {' '};
+    int iterator = 0;
+
+    // starting from 1 because 0 is @
+    for(unsigned int i = 4; i < len; i++) {
+      char c = wejscie[i];
+      if (c >= 'a' && c <= 'z') {
+        variable[iterator++] = '@';
+        while(i < len && c >= 'a' && c <= 'z') {
+          variable[iterator++] = wejscie[i++];
+          c = wejscie[i];
+        }
+        --i; // going backward to convert cursor position
+
+        while(i < len && c != '=') {
+          c = wejscie[++i];
+        }
+        c = wejscie[++i]; // eat = char;
+
+        while(i < len - 1) {
+          char cc = wejscie[i++];
+          if(cc != '\n') {
+            var_text[iter++] = cc;
+          }
+        }
+
+      }
+    }
+
+    set(tree, variable, var_text);
+
+    return 1;
+  }
+
+  return 0;
+}
+
+void onp(char* rownanie, Tree* tree) {
+  //if(handle_variables(rownanie, tree)) return;
+
   DoubleStack stos;
   d_init(&stos);
   const int len = strlen(rownanie);
+
   for(unsigned int i = 0; i < len; i++) {
     char c = rownanie[i];
 
@@ -53,6 +98,7 @@ void onp(char* rownanie) {
         function[iterator++] = rownanie[i++];
         c = rownanie[i];
       }
+      --i;
 
       double wynik;
       if(strstr(function, "add") != 0) {
@@ -150,11 +196,14 @@ void onp(char* rownanie) {
   printf("%f\n", d_pop(&stos));
 }
 
-void infix(char* wejscie) {
+void infix(char* wejscie, Tree* tree) {
+  if(handle_variables(wejscie, tree)) return;
+
   CharStack stos;
   StringStack function_stack;
   s_init(&function_stack);
   c_init(&stos);
+
   const unsigned int len = strlen(wejscie);
   char wyjscie[1024] = {' '};
   unsigned int iterator = 0;
@@ -245,6 +294,29 @@ void infix(char* wejscie) {
       wyjscie[iterator++] = ' ';
     }
 
+    else if(c == '@') {
+      char variable[64] = {' '};
+      int iter = 0;
+      // eat @
+      int c_remove_start = i;
+      variable[iter++] = '@';
+      c = wejscie[++i];
+      while(i < len && c >= 'a' && c <= 'z') {
+        variable[iter++] = wejscie[i++];
+        c = wejscie[i];
+      }
+      --i;
+
+      char* var_text = get(tree, variable);
+      unsigned int len = strlen(var_text);
+      int ii = 0;
+      while(ii < len) {
+        wyjscie[iterator++] = var_text[ii++];
+      }
+
+      wyjscie[iterator++] = ' ';
+    }
+
     else if (c >= 'a' && c <= 'z') { // funkcje
       char function[64] = {' '};
       int iterator = 0;
@@ -292,8 +364,8 @@ void infix(char* wejscie) {
     }
   }
 
-  printf("wyjscie: %s\n", wyjscie);
-  onp(wyjscie);
+  //printf("wyjscie: %s\n", wyjscie);
+  onp(wyjscie, tree);
 }
 
 int main (int argc, char** argv) {
@@ -301,42 +373,35 @@ int main (int argc, char** argv) {
   Tree tree;
   init_tree(&tree);
 
-  set(&tree, "a", "zmienna a");
-  set(&tree, "b", "zmienna b");
-  set(&tree, "c", "zmienna c");
+  int mode = 0; // set infix to default
+  for(unsigned int i = 0; i < argc; i++) {
+    char* arg = argv[i];
+    if(strstr(arg, "--infix") != 0) {
+      mode = 0;
+      printf("Running in INFIX mode\n");
+      break;
+    }
+    else if(strstr(arg, "--onp") != 0) {
+      mode = 1;
+      printf("Running in ONP mode\n");
+      break;
+    }
+  }
 
-  char* data = get(&tree, "a");
-  printf("data: %s\n", data);
+  char rownanie[256] = {' '};
+  printf("> ");
 
-  /* int mode = 0; // set infix to default */
-  /* for(unsigned int i = 0; i < argc; i++) { */
-  /*   char* arg = argv[i]; */
-  /*   if(strstr(arg, "--infix") != 0) { */
-  /*     mode = 0; */
-  /*     printf("Running in INFIX mode\n"); */
-  /*     break; */
-  /*   } */
-  /*   else if(strstr(arg, "--onp") != 0) { */
-  /*     mode = 1; */
-  /*     printf("Running in ONP mode\n"); */
-  /*     break; */
-  /*   } */
-  /* } */
-
-  /* char rownanie[256] = {' '}; */
-  /* printf("> "); */
-
-  /* while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) { */
-  /*   switch(mode) { */
-  /*   case 0: //infix */
-  /*     infix(rownanie); */
-  /*     break; */
-  /*   case 1: // onp */
-  /*     onp(rownanie); */
-  /*     break; */
-  /*   } */
-  /*   printf("> "); */
-  /* } */
+  while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) {
+    switch(mode) {
+    case 0: //infix
+      infix(rownanie, &tree);
+      break;
+    case 1: // onp
+      onp(rownanie, &tree);
+      break;
+    }
+    printf("> ");
+  }
 
   // dealocate tree
   clear_tree(&tree);

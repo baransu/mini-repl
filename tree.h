@@ -8,90 +8,103 @@ typedef struct Leaf Leaf;
 
 struct Tree {
   Leaf* root;
-  unsigned int count;
 };
 typedef struct Tree Tree;
 
 void init_tree(Tree* tree) {
-  tree->count = 0;
+  tree->root = 0;
 }
 
-void add_leaf(Leaf* leaf, Leaf* new_leaf) {
-  int names_equality = strcmp(leaf->name, new_leaf->name);
-  if(names_equality == 0) {
-    leaf->data = new_leaf->data;
-  }
+void add_leaf(Leaf** leaf, char* name, char* data) {
 
-  else if (names_equality > 0) {
-    if(leaf->right) {
-      add_leaf(leaf->right, new_leaf);
-    } else {
-      leaf->right = new_leaf;
+  if(*leaf == 0) {
+    *leaf = (Leaf*) malloc(sizeof( struct Leaf ));
+    (*leaf)->name = malloc(64);
+    strcpy((*leaf)->name, name);
+    (*leaf)->data = malloc(256);
+    strcpy((*leaf)->data, data);
+    (*leaf)->left = 0;
+    (*leaf)->right = 0;
+  } else {
+    int names_equality = strcmp(name, (*leaf)->name);
+
+    if(names_equality == 0) {
+      strcpy((*leaf)->data, data);
+    }
+
+    else if (names_equality > 0) {
+      add_leaf(&(*leaf)->right, name, data);
+    }
+
+    else {
+      add_leaf(&(*leaf)->left, name, data);
     }
   }
 
-  else if (leaf->left) {
-    add_leaf(leaf->left, new_leaf);
-  }
-
-  else {
-    leaf->left = new_leaf;
-  }
-
-}
-
-void add_to_tree(Tree* tree, Leaf* leaf) {
-  if(!tree->root) {
-    tree->root = leaf;
-  }
-
-  else {
-    add_leaf(tree->root, leaf);
-  }
 }
 
 void set(Tree* tree, char* name, char* data) {
-  Leaf* leaf = malloc(sizeof(Leaf));
-  leaf->name = name;
-  leaf->data = data;
-  leaf->right = NULL;
-  leaf->left = NULL;
-  add_to_tree(tree, leaf);
+  add_leaf(&tree->root, name, data);
 }
 
 char* get_leaf(Leaf* leaf, char* name) {
-  int names_equality = strcmp(leaf->name, name);
+  if(leaf != 0) {
+    int names_equality = strcmp(leaf->name, name);
+    if(names_equality == 0) {
+      return leaf->data;
+    }
 
-  if(names_equality == 0) {
-    return leaf->data;
+    else if (names_equality > 0 && leaf->right != 0) {
+      return get_leaf(leaf->right, name);
+    }
+
+    else if (leaf->left != 0) {
+      return get_leaf(leaf->left, name);
+    }
   }
 
-  else if (names_equality > 0 && leaf->right) {
-    return get_leaf(leaf->right, name);
-  }
-
-  else if (leaf->left) {
-    return get_leaf(leaf->left, name);
-  }
-
-  return NULL;
+  return 0;
 }
 
 char* get(Tree* tree, char* name) {
-  if(tree->root) {
+
+  if(tree->root != 0) {
     return get_leaf(tree->root, name);
   }
 
-  return NULL;
+  return 0;
 }
 
 void clear_leaf(Leaf* leaf) {
-  if(leaf->left) clear_leaf(leaf->left);
-  if(leaf->right) clear_leaf(leaf->right);
+  if(leaf->left != 0) clear_leaf(leaf->left);
+  if(leaf->right != 0) clear_leaf(leaf->right);
+  free(leaf->data);
+  free(leaf->name);
   free(leaf);
 }
 
 void clear_tree(Tree* tree) {
-  if(tree->root) clear_leaf(tree->root);
+  if(tree->root != 0) clear_leaf(tree->root);
+}
+
+void print_leaf(Leaf* leaf, char* parent) {
+  if(leaf)
+    printf("parent: %s | name: %s | data: %s\n", parent, leaf->name, leaf->data);
+
+  if(leaf->left != 0)
+    print_leaf(leaf->left, leaf->name);
+
+  if(leaf->right != 0)
+    print_leaf(leaf->right, leaf->name);
+}
+
+void print_tree(Tree* tree) {
+  if(tree->root != 0) {
+    print_leaf(tree->root, "tree");
+  }
+
+  else {
+    printf("root is null\n");
+  }
 }
 
