@@ -8,6 +8,8 @@
 #include "math.h"
 #include "tree.h"
 
+double infix(char* wejscie, Tree* tree);
+
 int handle_variables(char* wejscie, Tree* tree) {
   const int len = strlen(wejscie);
   if(len > 4 && strstr(wejscie, "let") != 0) {
@@ -15,6 +17,7 @@ int handle_variables(char* wejscie, Tree* tree) {
     int iter = 0;
     char variable[64] = {' '};
     int iterator = 0;
+    double var = 0;
 
     // starting from 1 because 0 is @
     for(unsigned int i = 4; i < len; i++) {
@@ -39,10 +42,11 @@ int handle_variables(char* wejscie, Tree* tree) {
           }
         }
 
+        var = infix(var_text, tree);
       }
     }
 
-    set(tree, variable, var_text);
+    set(tree, variable, var);
 
     return 1;
   }
@@ -50,15 +54,13 @@ int handle_variables(char* wejscie, Tree* tree) {
   return 0;
 }
 
-void onp(char* rownanie, Tree* tree) {
-  //if(handle_variables(rownanie, tree)) return;
-
+double onp(char* wejscie, Tree* tree) {
   DoubleStack stos;
   d_init(&stos);
-  const int len = strlen(rownanie);
+  const int len = strlen(wejscie);
 
   for(unsigned int i = 0; i < len; i++) {
-    char c = rownanie[i];
+    char c = wejscie[i];
 
     if((c == '+' || c == '/' || c == '-' || c == '*' || c == '^') && d_size(&stos) > 1) {
       double wynik;
@@ -95,8 +97,8 @@ void onp(char* rownanie, Tree* tree) {
       int iterator = 0;
 
       while(i < len && c >= 'a' && c <= 'z') {
-        function[iterator++] = rownanie[i++];
-        c = rownanie[i];
+        function[iterator++] = wejscie[i++];
+        c = wejscie[i];
       }
       --i;
 
@@ -127,7 +129,7 @@ void onp(char* rownanie, Tree* tree) {
         double fst = d_pop(&stos);
         if(snd == 0) {
           printf("Cannot divide by 0!!!\n");
-          return;
+          return 0;
         }
         wynik = fst / snd;
         d_push(&stos, wynik);
@@ -183,22 +185,25 @@ void onp(char* rownanie, Tree* tree) {
       char number[256] = {' '};
       int iterator = 0;
       while((i < len && c >= '0' && c <= '9') || c == '.') {
-        number[iterator++] = rownanie[i++];
-        c = rownanie[i];
+        number[iterator++] = wejscie[i++];
+        c = wejscie[i];
       }
       double val = 0;
       sscanf(number, "%lf", &val);
       d_push(&stos, val);
     }
 
+    else if (c == '@') {
+      // TODO get variable from heap and push to stack
+    }
+
   }
 
-  printf("%f\n", d_pop(&stos));
+  double result = d_pop(&stos);
+  return result;
 }
 
-void infix(char* wejscie, Tree* tree) {
-  if(handle_variables(wejscie, tree)) return;
-
+double infix(char* wejscie, Tree* tree) {
   CharStack stos;
   StringStack function_stack;
   s_init(&function_stack);
@@ -306,15 +311,17 @@ void infix(char* wejscie, Tree* tree) {
       }
       --i;
 
-      char* var_text = get(tree, variable);
-      if(var_text == 0) {
-        printf("I could not find variable: %s\n", variable);
-        return;
-      }
-      unsigned int len = strlen(var_text);
+      double var = get(tree, variable);
+      /* if(var == NULL) { */
+      /*   printf("I could not find variable: %s\n", variable); */
+      /*   return 0; */
+      /* } */
+      char result_string[50] = {' '};
+      snprintf(result_string, 50, "%f", var);
+      unsigned int len = strlen(result_string);
       int ii = 0;
       while(ii < len) {
-        wyjscie[iterator++] = var_text[ii++];
+        wyjscie[iterator++] = result_string[ii++];
       }
 
       wyjscie[iterator++] = ' ';
@@ -368,7 +375,8 @@ void infix(char* wejscie, Tree* tree) {
   }
 
   //printf("wyjscie: %s\n", wyjscie);
-  onp(wyjscie, tree);
+  double result = onp(wyjscie, tree);
+  return result;
 }
 
 int main (int argc, char** argv) {
@@ -385,7 +393,7 @@ int main (int argc, char** argv) {
       break;
     }
     else if(strstr(arg, "--onp") != 0) {
-      mode = 1;
+      mode = 0;
       printf("Running in ONP mode\n");
       break;
     }
@@ -398,7 +406,9 @@ int main (int argc, char** argv) {
     if(strstr(rownanie, "print") != 0) print_tree(&tree);
     switch(mode) {
     case 0: //infix
-      infix(rownanie, &tree);
+      if(!handle_variables(rownanie, &tree)) {
+        printf("%f\n", infix(rownanie, &tree));
+      }
       break;
     case 1: // onp
       onp(rownanie, &tree);
