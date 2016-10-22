@@ -184,7 +184,7 @@ double onp(char* wejscie, Tree* tree) {
     else if ((c >= '0' && c <= '9') || c == '.') {
       char number[256] = {' '};
       int iterator = 0;
-      while((i < len && c >= '0' && c <= '9') || c == '.') {
+      while(i < len && ((c >= '0' && c <= '9') || c == '.')) {
         number[iterator++] = wejscie[i++];
         c = wejscie[i];
       }
@@ -279,20 +279,21 @@ double infix(char* wejscie, Tree* tree) {
       c_push(&stos, c);
     }
 
-    else if (c >= '0' && c <= '9') {
-      // TODO liczby zmienno-przecinkowe
+    else if ((c >= '0' && c <= '9') || c == '.') {
       char number[256] = {' '};
       unsigned int ii = 0;
       do {
         number[ii++] = c;
         c = wejscie[++i];
-      } while(i < len - 1 && c >= '0' && c <= '9');
+      } while(i < len && ((c >= '0' && c <= '9') || c == '.'));
       --i;
+
       const unsigned int ln = strlen(number);
       for(unsigned int i = 0; i < ln; i++) {
         wyjscie[iterator++] = number[i];
       }
       wyjscie[iterator++] = ' ';
+
     }
 
     else if(c == '@') {
@@ -375,7 +376,7 @@ int main (int argc, char** argv) {
   Tree tree;
   init_tree(&tree);
 
-  int mode = 0; // set infix to default
+  int mode = 0; // set infix mode to default
   for(unsigned int i = 0; i < argc; i++) {
     char* arg = argv[i];
     if(strstr(arg, "--infix") != 0) {
@@ -385,7 +386,7 @@ int main (int argc, char** argv) {
     }
     else if(strstr(arg, "--onp") != 0) {
       mode = 0;
-      printf("Running in ONP mode\n");
+      printf("ONP mode not supported\n");
       break;
     }
   }
