@@ -31,8 +31,6 @@ It also has support for floating point value
 4.20
 ```
 
-`mini-repl is not supporting `
-
 ### Functions
 
 Functions are reprezented as `function(a,b)`. One argument function has to have trailing coma after argument. It's not forbidden with more than one argument. 
