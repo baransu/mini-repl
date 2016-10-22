@@ -15,14 +15,13 @@ int d_isEmpty(DoubleStack* stos) {
 }
 
 double d_pop(DoubleStack* stos) {
-  const double last = stos->stack[stos->top];
   stos->top -= 1;
-  return last;
+  return stos->stack[stos->top];
 }
 
 void d_push(DoubleStack* stos, double wartosc) {
-  stos->top += 1;
   stos->stack[stos->top] = wartosc;
+  stos->top += 1;
 }
 
 int d_size(DoubleStack* stos) {
@@ -50,9 +49,8 @@ int c_isEmpty(CharStack* stos) {
 }
 
 char c_pop(CharStack* stos) {
-  const char last = stos->stack[stos->top];
   stos->top -= 1;
-  return last;
+  return stos->stack[stos->top];
 }
 
 char c_back(CharStack* stos) {
@@ -61,8 +59,8 @@ char c_back(CharStack* stos) {
 
 
 void c_push(CharStack* stos, char wartosc) {
-  stos->top += 1;
   stos->stack[stos->top] = wartosc;
+  stos->top += 1;
 }
 
 int c_size(CharStack* stos) {
@@ -81,7 +79,13 @@ typedef struct StringStack StringStack;
 void s_init(StringStack *stos) {
   stos->top = 0;
   for(unsigned short i = 0; i < 1024; i++) {
-    stos->stack[i] = "";
+    stos->stack[i] = malloc(256);
+  }
+}
+
+void s_clear(StringStack *stos) {
+  for(unsigned short i = 0; i < 1024; i++) {
+    free(stos->stack[i]);
   }
 }
 
@@ -89,19 +93,18 @@ int s_isEmpty(StringStack* stos) {
   return stos->top;
 }
 
-char* s_pop(StringStack* stos) {
-  char* last = stos->stack[stos->top];
-  stos->top -= 1;
-  return last;
-}
-
 char* s_back(StringStack* stos) {
   return stos->stack[stos->top];
 }
 
+char* s_pop(StringStack* stos) {
+  stos->top -= 1;
+  return stos->stack[stos->top];
+}
+
 void s_push(StringStack* stos, char* wartosc) {
+  strcpy(stos->stack[stos->top], wartosc);
   stos->top += 1;
-  stos->stack[stos->top] = wartosc;
 }
 
 int s_size(StringStack* stos) {

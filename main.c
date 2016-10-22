@@ -193,10 +193,6 @@ double onp(char* wejscie, Tree* tree) {
       d_push(&stos, val);
     }
 
-    else if (c == '@') {
-      // TODO get variable from heap and push to stack
-    }
-
   }
 
   double result = d_pop(&stos);
@@ -226,8 +222,8 @@ double infix(char* wejscie, Tree* tree) {
           if(top == '#') {
             char* function = s_pop(&function_stack);
             unsigned int len = strlen(function);
-            for(unsigned int i = 0; i < len; i++) {
-              wyjscie[iterator++] = function[i];
+            for(unsigned int ii = 0; ii < len; ii++) {
+              wyjscie[iterator++] = function[ii];
             }
           } else {
             wyjscie[iterator++] = top;
@@ -312,10 +308,6 @@ double infix(char* wejscie, Tree* tree) {
       --i;
 
       double var = get(tree, variable);
-      /* if(var == NULL) { */
-      /*   printf("I could not find variable: %s\n", variable); */
-      /*   return 0; */
-      /* } */
       char result_string[50] = {' '};
       snprintf(result_string, 50, "%f", var);
       unsigned int len = strlen(result_string);
@@ -374,7 +366,6 @@ double infix(char* wejscie, Tree* tree) {
     }
   }
 
-  //printf("wyjscie: %s\n", wyjscie);
   double result = onp(wyjscie, tree);
   return result;
 }
