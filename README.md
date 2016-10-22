@@ -28,7 +28,7 @@ It also has support for floating point value
 
 ```
 > 2.1 + 2.1
-4.2
+4.20
 ```
 
 `mini-repl is not supporting `
