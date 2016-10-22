@@ -171,12 +171,24 @@ double onp(char* wejscie, Tree* tree) {
         d_push(&stos, cosine(d_pop(&stos)));
       }
 
+      else if(strstr(function, "tg") != 0) { // tangent
+        d_push(&stos, tangent(d_pop(&stos)));
+      }
+
       else if(strstr(function, "rad") != 0) { // convert to radians
         d_push(&stos, to_radians(d_pop(&stos)));
       }
 
       else if(strstr(function, "deg") != 0) { // convert to degrees
         d_push(&stos, to_degrees(d_pop(&stos)));
+      }
+
+      else if(strstr(function, "pi") != 0) { // pi
+        d_push(&stos, PI);
+      }
+
+      else if(strstr(function, "abs") != 0) { // pi
+        d_push(&stos, absolute(d_pop(&stos)));
       }
 
     }
@@ -221,6 +233,7 @@ double infix(char* wejscie, Tree* tree) {
         if(top != '(') {
           if(top == '#') {
             char* function = s_pop(&function_stack);
+            printf("found function %s\n", function);
             unsigned int len = strlen(function);
             for(unsigned int ii = 0; ii < len; ii++) {
               wyjscie[iterator++] = function[ii];
@@ -249,7 +262,7 @@ double infix(char* wejscie, Tree* tree) {
           for(unsigned int i = 0; i < len; i++) {
             wyjscie[iterator++] = function[i];
           }
-
+          wyjscie[iterator++] = ' ';
         } else break;
 
       }
@@ -273,7 +286,7 @@ double infix(char* wejscie, Tree* tree) {
           for(unsigned int i = 0; i < len; i++) {
             wyjscie[iterator++] = function[i];
           }
-
+          wyjscie[iterator++] = ' ';
         } else break;
       }
       c_push(&stos, c);
@@ -286,14 +299,13 @@ double infix(char* wejscie, Tree* tree) {
         number[ii++] = c;
         c = wejscie[++i];
       } while(i < len && ((c >= '0' && c <= '9') || c == '.'));
-      --i;
+      c = wejscie[--i];
 
       const unsigned int ln = strlen(number);
-      for(unsigned int i = 0; i < ln; i++) {
-        wyjscie[iterator++] = number[i];
+      for(unsigned int j = 0; j < ln; j++) {
+        wyjscie[iterator++] = number[j];
       }
       wyjscie[iterator++] = ' ';
-
     }
 
     else if(c == '@') {
@@ -340,6 +352,7 @@ double infix(char* wejscie, Tree* tree) {
         if(top != '(') {
           if(top == '#') {
             char* function = s_pop(&function_stack);
+            printf("i have function: %s\n", function);
             unsigned int len = strlen(function);
             for(unsigned int i = 0; i < len; i++) {
               wyjscie[iterator++] = function[i];
@@ -367,6 +380,7 @@ double infix(char* wejscie, Tree* tree) {
     }
   }
 
+  printf("wyjscie: %s\n", wyjscie);
   double result = onp(wyjscie, tree);
   return result;
 }

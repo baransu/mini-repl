@@ -73,6 +73,18 @@ double cosine(double x) { // liczmy w radianach
   return cos;
 }
 
+double tangent(double x) {
+  double c = cosine(x);
+  if(c == 0) return 0;
+  return sine(x)/c;
+}
+
+double cotangent(double x) {
+  double s = sine(x);
+  if(s == 0) return 0;
+  return cosine(x)/s;
+}
+
 double root(double a, double n) {
   double result = a;
   double tmp = power(result,(n - 1));
@@ -92,4 +104,8 @@ int min(int a, int b) {
 
 int max(int a, int b) {
   return a > b ? a : b;
+}
+
+double absolute(double x) {
+  return x < 0 ? x * -1 : x;
 }
