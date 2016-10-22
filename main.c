@@ -171,8 +171,12 @@ double onp(char* wejscie, Tree* tree) {
         d_push(&stos, cosine(d_pop(&stos)));
       }
 
-      else if(strstr(function, "tg") != 0) { // tangent
+      else if(strstr(function, "tangent") != 0) { // tangent
         d_push(&stos, tangent(d_pop(&stos)));
+      }
+
+      else if(strstr(function, "cotangent") != 0) { // cotangent
+        d_push(&stos, cotangent(d_pop(&stos)));
       }
 
       else if(strstr(function, "rad") != 0) { // convert to radians
@@ -233,7 +237,6 @@ double infix(char* wejscie, Tree* tree) {
         if(top != '(') {
           if(top == '#') {
             char* function = s_pop(&function_stack);
-            printf("found function %s\n", function);
             unsigned int len = strlen(function);
             for(unsigned int ii = 0; ii < len; ii++) {
               wyjscie[iterator++] = function[ii];
@@ -380,7 +383,7 @@ double infix(char* wejscie, Tree* tree) {
     }
   }
 
-  printf("wyjscie: %s\n", wyjscie);
+  //printf("wyjscie: %s\n", wyjscie);
   double result = onp(wyjscie, tree);
   return result;
 }
@@ -413,7 +416,7 @@ int main (int argc, char** argv) {
     switch(mode) {
     case 0: //infix
       if(!handle_variables(rownanie, &tree)) {
-        printf("%f\n", infix(rownanie, &tree));
+        printf("%0.2f\n", infix(rownanie, &tree));
       }
       break;
     case 1: // onp
