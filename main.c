@@ -191,7 +191,7 @@ double onp(char* wejscie, Tree* tree) {
         d_push(&stos, PI);
       }
 
-      else if(strstr(function, "abs") != 0) { // pi
+      else if(strstr(function, "abs") != 0) { // abs
         d_push(&stos, absolute(d_pop(&stos)));
       }
 
@@ -213,6 +213,31 @@ double onp(char* wejscie, Tree* tree) {
 
   double result = d_pop(&stos);
   return result;
+}
+
+// handle infix operators
+void handle_operators(char* wyjscie, CharStack* stos, StringStack* function_stack, char c, char* operators) {
+  int iterator = 0;
+  while(c_size(stos) > 0) {
+    char o2 = c_back(stos);
+
+    if(strstr(operators, &o2) != 0) {
+      wyjscie[iterator++] = o2;
+      wyjscie[iterator++] = ' ';
+      c_pop(stos);
+    }
+
+    else if(o2 == '#') {
+      c_pop(stos);
+      char* function = s_pop(function_stack);
+      unsigned int len = strlen(function);
+      for(unsigned int i = 0; i < len; i++) {
+        wyjscie[iterator++] = function[i];
+      }
+      wyjscie[iterator++] = ' ';
+    } else break;
+  }
+  c_push(stos, c);
 }
 
 double infix(char* wejscie, Tree* tree) {
@@ -250,50 +275,57 @@ double infix(char* wejscie, Tree* tree) {
     }
 
     else if (c == '+' || c == '-') {
-      while(c_size(&stos) > 0) {
-        char o2 = c_back(&stos);
-        if(o2 == '+' || o2 == '-' || o2 == '*' || o2 == '/') {
-          wyjscie[iterator++] = o2;
-          wyjscie[iterator++] = ' ';
-          c_pop(&stos);
-        }
+      char* addition = malloc(64);
+      handle_operators(addition,
+                       &stos,
+                       &function_stack,
+                       c,
+                       "+-*/^"
+                       );
 
-        else if(o2 == '#') {
-          c_pop(&stos);
-          char* function = s_pop(&function_stack);
-          unsigned int len = strlen(function);
-          for(unsigned int i = 0; i < len; i++) {
-            wyjscie[iterator++] = function[i];
-          }
-          wyjscie[iterator++] = ' ';
-        } else break;
-
+      // checking len and not using addiition alocated size to check prevent adding empty array string to output which is overwriting our output
+      unsigned int len = strlen(addition);
+      for(int x = 0; x < len; x++) {
+        wyjscie[iterator++] = addition[x];
       }
-      c_push(&stos, c);
+      free(addition);
     }
 
-    else if (c == '*' || c == '/') {
-      while(c_size(&stos) > 0) {
-        char o2 = c_back(&stos);
+    else if(c == '*' || c == '/') {
+      // TODO handle * / ^
+      char* addition = malloc(64);
+      handle_operators(addition,
+                       &stos,
+                       &function_stack,
+                       c,
+                       "*/^"
+                       );
 
-        if(o2 == '*' || o2 == '/') {
-          wyjscie[iterator++] = o2;
-          wyjscie[iterator++] = ' ';
-          c_pop(&stos);
-        }
-
-        else if(o2 == '#') {
-          c_pop(&stos);
-          char* function = s_pop(&function_stack);
-          unsigned int len = strlen(function);
-          for(unsigned int i = 0; i < len; i++) {
-            wyjscie[iterator++] = function[i];
-          }
-          wyjscie[iterator++] = ' ';
-        } else break;
+      // checking len and not using addiition alocated size to check prevent adding empty array string to output which is overwriting our output
+      unsigned int len = strlen(addition);
+      for(int x = 0; x < len; x++) {
+        wyjscie[iterator++] = addition[x];
       }
-      c_push(&stos, c);
+      free(addition);
     }
+
+    else if(c == '^') {
+      char* addition = malloc(64);
+      handle_operators(addition,
+                       &stos,
+                       &function_stack,
+                       c,
+                       "^"
+                       );
+
+      // checking len and not using addiition alocated size to check prevent adding empty array string to output which is overwriting our output
+      unsigned int len = strlen(addition);
+      for(int x = 0; x < len; x++) {
+        wyjscie[iterator++] = addition[x];
+      }
+      free(addition);
+    }
+
 
     else if ((c >= '0' && c <= '9') || c == '.') {
       char number[256] = {' '};
@@ -355,7 +387,6 @@ double infix(char* wejscie, Tree* tree) {
         if(top != '(') {
           if(top == '#') {
             char* function = s_pop(&function_stack);
-            printf("i have function: %s\n", function);
             unsigned int len = strlen(function);
             for(unsigned int i = 0; i < len; i++) {
               wyjscie[iterator++] = function[i];
