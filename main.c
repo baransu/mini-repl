@@ -355,7 +355,6 @@ double infix(char* wejscie, Tree* tree) {
         if(top != '(') {
           if(top == '#') {
             char* function = s_pop(&function_stack);
-            printf("i have function: %s\n", function);
             unsigned int len = strlen(function);
             for(unsigned int i = 0; i < len; i++) {
               wyjscie[iterator++] = function[i];

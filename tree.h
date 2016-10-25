@@ -42,6 +42,7 @@ void add_leaf(Leaf** leaf, char* name, double value) {
 
 }
 
+
 void set(Tree* tree, char* name, double value) {
   add_leaf(&tree->root, name, value);
 }
