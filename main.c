@@ -9,6 +9,32 @@
 #include "tree.h"
 
 double infix(char* wejscie, Tree* tree);
+int conversion = 0;
+void convert(int liczba, int system) {
+  if(liczba >= system) {
+    convert(liczba/system, system);
+    if(liczba % system == 10) printf("A");
+    else if(liczba % system == 11) printf("B");
+    else if(liczba % system == 12) printf("C");
+    else if(liczba % system == 13) printf("D");
+    else if(liczba % system == 14) printf("E");
+    else if(liczba % system == 15) printf("F");
+    else printf("%d", liczba % system);
+  }
+  else {
+    if(system > 10) {
+      if(liczba == 10) printf("A");
+      else if(liczba == 11) printf("B");
+      else if(liczba == 12) printf("C");
+      else if(liczba == 13) printf("D");
+      else if(liczba == 14) printf("E");
+      else if(liczba == 15) printf("F");
+    }
+    else {
+      printf("%d", liczba);
+    }
+  }
+}
 
 int handle_variables(char* wejscie, Tree* tree) {
   const int len = strlen(wejscie);
@@ -195,6 +221,12 @@ double onp(char* wejscie, Tree* tree) {
         d_push(&stos, absolute(d_pop(&stos)));
       }
 
+      else if(strstr(function, "convert") != 0) {
+        int system = d_pop(&stos);
+        int liczba = d_pop(&stos);
+        convert(liczba, system);
+        conversion = 1;
+      }
     }
 
     else if ((c >= '0' && c <= '9') || c == '.') {
@@ -411,11 +443,19 @@ int main (int argc, char** argv) {
   printf("> ");
 
   while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) {
-    if(strstr(rownanie, "print") != 0) print_tree(&tree);
+    if(strstr(rownanie, "print") != 0) {
+      print_tree(&tree);
+    };
     switch(mode) {
     case 0: //infix
       if(!handle_variables(rownanie, &tree)) {
-        printf("%0.2f\n", infix(rownanie, &tree));
+        double result = infix(rownanie, &tree);
+        if(!conversion) {
+          printf("%0.2f\n", result);
+        } else {
+          conversion = 0;
+          printf("\n");
+        }
       }
       break;
     case 1: // onp
