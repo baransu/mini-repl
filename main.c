@@ -28,7 +28,6 @@ void from_dec(int number, int base) {
 }
 
 int int_len(number) {
-  printf("%d\n", number);
   if(number == 0) {
     return 1;
   }
@@ -39,7 +38,7 @@ int to_dec(int number, int base) {
   int len = int_len(number);
   int sum = 0;
   for (int i = 0; i < len; ++i, number /= 10 ) {
-    sum += (number % 10) * pow(base, len - i - 1);
+    sum += (number % 10) * pow(base, i);
   }
   return sum;
 }
@@ -245,6 +244,21 @@ double onp(char* wejscie, Tree* tree) {
         int number = d_pop(&stos);
         if(base >= 2 ) {
           d_push(&stos, to_dec(number, base));
+        } else {
+          printf("Base has to be greater than 1\n");
+        }
+      }
+
+      else if(strstr(function, "grey") != 0) {
+        int base = d_pop(&stos);
+        int number = d_pop(&stos);
+        if(base >= 2 ) {
+          int value = number;
+          if(base != 10) {
+            value = to_dec(number, base);
+          }
+          from_dec(value ^ (value >> 1), 2);
+          printf("\n");
         } else {
           printf("Base has to be greater than 1\n");
         }

@@ -3,7 +3,7 @@
 Miniamal REPL written in C
 
 ## Building
-Available Makefile with `make start` which build ussing `gcc` on macOS nad Linux
+Available Makefile with `make start` which builds using `gcc` on macOS nad Linux
 
 ```bash
 make start
@@ -33,7 +33,8 @@ It also has support for floating point value
 
 ### Functions
 
-Functions are reprezented as `function(a,b)`. One argument function has to have trailing coma after argument. It's not forbidden with more than one argument. 
+Functions are reprezented as `function(a,b)`. One argument function has to have trailing coma after argument.
+It's not forbidden with more than one argument. 
 
 Available functions
 * `add(a, b)`
@@ -48,6 +49,9 @@ Available functions
 * `tangent(x)`
 * `cotangent(x)`
 * `pi` - takes no arguments and returns PI
+* `fromdec(number, base)` - returns decimal value in specified base
+* `todec(number, base)` - returns decimal value
+* `grey(number, base)` - returns binary number in Grey code
 
 ### Negative values
 `mini-repl` do not understand negative values as for example `-1`. You have to use `neg(a)` function to negate given value
