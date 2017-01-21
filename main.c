@@ -11,9 +11,9 @@
 double infix(char* wejscie, Tree* tree);
 int conversion = 0;
 
-void fromDec(int number, int base) {
+void from_dec(int number, int base) {
   if(number >= base) {
-    fromDec(number/base, base);
+    from_dec(number/base, base);
     int rest = number % base;
     if(rest >= 10)
       printf("%c", rest + 55);
@@ -25,6 +25,23 @@ void fromDec(int number, int base) {
     else
       printf("%d", number);
   }
+}
+
+int int_len(number) {
+  printf("%d\n", number);
+  if(number == 0) {
+    return 1;
+  }
+  return log10(abs(number)) + 1;
+}
+
+int to_dec(int number, int base) {
+  int len = int_len(number);
+  int sum = 0;
+  for (int i = 0; i < len; ++i, number /= 10 ) {
+    sum += (number % 10) * pow(base, len - i - 1);
+  }
+  return sum;
 }
 
 int handle_variables(char* wejscie, Tree* tree) {
@@ -212,12 +229,22 @@ double onp(char* wejscie, Tree* tree) {
         d_push(&stos, absolute(d_pop(&stos)));
       }
 
-      else if(strstr(function, "from") != 0) {
+      else if(strstr(function, "fromdec") != 0) {
         int base = d_pop(&stos);
         int number = d_pop(&stos);
         if(base >= 2 ) {
-          fromDec(number, base);
+          from_dec(number, base);
           printf("\n");
+        } else {
+          printf("Base has to be greater than 1\n");
+        }
+      }
+
+      else if(strstr(function, "todec") != 0) {
+        int base = d_pop(&stos);
+        int number = d_pop(&stos);
+        if(base >= 2 ) {
+          d_push(&stos, to_dec(number, base));
         } else {
           printf("Base has to be greater than 1\n");
         }
@@ -418,20 +445,6 @@ int main (int argc, char** argv) {
   init_tree(&tree);
 
   printf("Running in INFIX mode\n");
-
-  /* int mode = 0; // set infix mode to default */
-  /* for(unsigned int i = 0; i < argc; i++) { */
-  /*   char* arg = argv[i]; */
-  /*   if(strstr(arg, "--infix") != 0) { */
-  /*     mode = 0; */
-  /*     break; */
-  /*   } */
-  /*   else if(strstr(arg, "--onp") != 0) { */
-  /*     mode = 0; */
-  /*     printf("ONP mode not supported\n"); */
-  /*     break; */
-  /*   } */
-  /* } */
 
   char rownanie[256] = {' '};
   printf("> ");
