@@ -10,29 +10,20 @@
 
 double infix(char* wejscie, Tree* tree);
 int conversion = 0;
+
 void convert(int liczba, int system) {
   if(liczba >= system) {
     convert(liczba/system, system);
-    if(liczba % system == 10) printf("A");
-    else if(liczba % system == 11) printf("B");
-    else if(liczba % system == 12) printf("C");
-    else if(liczba % system == 13) printf("D");
-    else if(liczba % system == 14) printf("E");
-    else if(liczba % system == 15) printf("F");
-    else printf("%d", liczba % system);
-  }
-  else {
-    if(system > 10) {
-      if(liczba == 10) printf("A");
-      else if(liczba == 11) printf("B");
-      else if(liczba == 12) printf("C");
-      else if(liczba == 13) printf("D");
-      else if(liczba == 14) printf("E");
-      else if(liczba == 15) printf("F");
-    }
-    else {
+    int reszta = liczba % system;
+    if(reszta >= 10)
+      printf("%c", reszta + 55);
+    else
+      printf("%d", reszta);
+  } else {
+    if(liczba > 10 && system > 10)
+      printf("%c", liczba + 55);
+    else
       printf("%d", liczba);
-    }
   }
 }
 
@@ -45,7 +36,7 @@ int handle_variables(char* wejscie, Tree* tree) {
     int iterator = 0;
     double var = 0;
 
-    // starting from 1 because 0 is @
+    // starting from 4 because 0 is 'let '
     for(unsigned int i = 4; i < len; i++) {
       char c = wejscie[i];
       if (c >= 'a' && c <= 'z') {
