@@ -11,19 +11,19 @@
 double infix(char* wejscie, Tree* tree);
 int conversion = 0;
 
-void convert(int liczba, int system) {
-  if(liczba >= system) {
-    convert(liczba/system, system);
-    int reszta = liczba % system;
-    if(reszta >= 10)
-      printf("%c", reszta + 55);
+void fromDec(int number, int base) {
+  if(number >= base) {
+    fromDec(number/base, base);
+    int rest = number % base;
+    if(rest >= 10)
+      printf("%c", rest + 55);
     else
-      printf("%d", reszta);
+      printf("%d", rest);
   } else {
-    if(liczba > 10 && system > 10)
-      printf("%c", liczba + 55);
+    if(number > 10 && base > 10)
+      printf("%c", number + 55);
     else
-      printf("%d", liczba);
+      printf("%d", number);
   }
 }
 
@@ -212,11 +212,15 @@ double onp(char* wejscie, Tree* tree) {
         d_push(&stos, absolute(d_pop(&stos)));
       }
 
-      else if(strstr(function, "convert") != 0) {
-        int system = d_pop(&stos);
-        int liczba = d_pop(&stos);
-        convert(liczba, system);
-        conversion = 1;
+      else if(strstr(function, "from") != 0) {
+        int base = d_pop(&stos);
+        int number = d_pop(&stos);
+        if(base >= 2 ) {
+          fromDec(number, base);
+          printf("\n");
+        } else {
+          printf("Base has to be greater than 1\n");
+        }
       }
     }
 
@@ -405,9 +409,7 @@ double infix(char* wejscie, Tree* tree) {
     }
   }
 
-  //printf("wyjscie: %s\n", wyjscie);
-  double result = onp(wyjscie, tree);
-  return result;
+  return onp(wyjscie, tree);
 }
 
 int main (int argc, char** argv) {
@@ -415,43 +417,31 @@ int main (int argc, char** argv) {
   Tree tree;
   init_tree(&tree);
 
-  int mode = 0; // set infix mode to default
-  for(unsigned int i = 0; i < argc; i++) {
-    char* arg = argv[i];
-    if(strstr(arg, "--infix") != 0) {
-      mode = 0;
-      printf("Running in INFIX mode\n");
-      break;
-    }
-    else if(strstr(arg, "--onp") != 0) {
-      mode = 0;
-      printf("ONP mode not supported\n");
-      break;
-    }
-  }
+  printf("Running in INFIX mode\n");
+
+  /* int mode = 0; // set infix mode to default */
+  /* for(unsigned int i = 0; i < argc; i++) { */
+  /*   char* arg = argv[i]; */
+  /*   if(strstr(arg, "--infix") != 0) { */
+  /*     mode = 0; */
+  /*     break; */
+  /*   } */
+  /*   else if(strstr(arg, "--onp") != 0) { */
+  /*     mode = 0; */
+  /*     printf("ONP mode not supported\n"); */
+  /*     break; */
+  /*   } */
+  /* } */
 
   char rownanie[256] = {' '};
   printf("> ");
 
-  while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, "exit") == 0 && strlen(rownanie) > 1) {
-    if(strstr(rownanie, "print") != 0) {
+  while(fgets(rownanie, sizeof(rownanie), stdin) != NULL && strstr(rownanie, ":exit") == 0 && strlen(rownanie) > 1) {
+    if(strstr(rownanie, ":print") != 0) {
       print_tree(&tree);
-    };
-    switch(mode) {
-    case 0: //infix
-      if(!handle_variables(rownanie, &tree)) {
-        double result = infix(rownanie, &tree);
-        if(!conversion) {
-          printf("%0.2f\n", result);
-        } else {
-          conversion = 0;
-          printf("\n");
-        }
-      }
-      break;
-    case 1: // onp
-      onp(rownanie, &tree);
-      break;
+    }
+    else if(!handle_variables(rownanie, &tree)) {
+      printf("%0.2f\n", infix(rownanie, &tree));
     }
     printf("> ");
   }
